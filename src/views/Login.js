@@ -36,7 +36,7 @@ class Login extends Component {
 					this.setState({ btnLoading: false })
 					if(res.code === 200){
 						const { access_token, member } = res.data;
-						Cookies('session', access_token);
+						Cookies.set('session', access_token);
 						localStorage.loginData = JSON.stringify(member);
 						this.props.history.push('/dashboard');
 					}else{

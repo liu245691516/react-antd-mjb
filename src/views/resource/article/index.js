@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { getMediaList } from '@/axios/api';
-import { Form, Input, Button, Select, Table, Divider } from 'antd';
+import { Form, Input, Button, Select, Table, Divider, message } from 'antd';
+import { object } from 'prop-types';
 
 const { Option } = Select;
 
@@ -78,22 +79,34 @@ class ResourceArticle extends Component {
             <div>
                 <Form layout="inline">
                     <Form.Item label="媒体名称">
-                        <Input value={params.title} />
+                        <Input value={this.state.params.title} name="title" onChange={this.changeSearchContent} />
                     </Form.Item>
                     <Form.Item label="案例地址">
-                        <Input />
+                        <Input value={this.state.params.case_address} name="case_address" onChange={this.changeSearchContent} />
                     </Form.Item>
                     <Form.Item label="用户名">
                         <Select
+                            value={this.state.params.member_id}
                             showSearch
                             style={{ width: 200 }}
+                            name="member_id"
+                            onChange={(e) => this.changeSearchMember(e, 'member_id')}
                         >
-                            <Option value="jack">Jack</Option>
-                            <Option value="lucy">Lucy</Option>
+                            <Option value="1">Jack</Option>
+                            <Option value="2">Lucy</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item label="收录效果">
-                        <Input />
+                        <Select
+                            value={this.state.params.record}
+                            showSearch
+                            style={{ width: 200 }}
+                            name="member_id"
+                            onChange={(e) => this.changeSearchMember(e, 'record')}
+                        >
+                            <Option value="1">200</Option>
+                            <Option value="2">404</Option>
+                        </Select>
                     </Form.Item>
                 </Form>
                 <div className="button-wrap">
@@ -119,12 +132,15 @@ class ResourceArticle extends Component {
     init(){
         this.setState({ tableLoading: true })
         getMediaList(this.state.params).then(res => {
+            this.setState({ tableLoading: false })
             if(res.code === 200){
                 this.setState({ 
                     tableData: res.data.list,
                     totalCount: res.data.totalCount,
                     tableLoading: false 
                 });
+            }else{
+                message.warning(res.message);
             }
         })
     }
@@ -135,6 +151,22 @@ class ResourceArticle extends Component {
         this.setState({ params: data }, () => {
             this.init();
         });
+    }
+
+    changeSearchContent = (e) => {
+        let key = e.target.name;
+        let value = e.target.value;
+        this.setFromState(key, value);
+    }
+
+    changeSearchMember = (value, key) => {
+        this.setFromState(key, value);
+    }
+
+    setFromState = (key, value) =>{
+        this.setState({
+            params: Object.assign({}, this.state.params, { [key]: value })
+        })
     }
 
     //搜索
